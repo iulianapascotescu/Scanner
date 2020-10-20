@@ -6,7 +6,7 @@ if (nr < +2)
 write false;
 }
 int i;
-i=2;
+i=+2;
 while(i < nr)
 {
  if (nr % i == 0)
