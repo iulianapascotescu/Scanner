@@ -1,0 +1,16 @@
+function f3{
+int n;
+read n;
+int vector[100];
+int i;
+i =0;
+int sum;
+sum=0;
+while(i<n)
+{
+ read v[i];
+sum = sum + v[i];
+ i=i+1;
+}
+write sum;
+}
