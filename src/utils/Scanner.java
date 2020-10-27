@@ -79,7 +79,7 @@ public class Scanner {
                     tokens.add(new Pair<>(newString, position));
                     newString = "";
                 }
-                else if((newString.charAt(newString.length() - 1)=='+' || newString.charAt(newString.length() - 1)=='-') && Character.isDigit(element.charAt(i)) && !(this.isAValidNumber(tokens.get(tokens.size()-1).element1)) && !(this.isIdentifier(tokens.get(tokens.size()-1).element1)) && !(this.isAVectorAccess(tokens.get(tokens.size()-1).element1))){
+                else if((newString.charAt(newString.length() - 1)=='+' || newString.charAt(newString.length() - 1)=='-') && Character.isDigit(element.charAt(i)) && !(this.isAValidNumber(tokens.get(tokens.size()-1))) && !(this.isIdentifier(tokens.get(tokens.size()-1).element1)) && !(this.isAVectorAccess(tokens.get(tokens.size()-1)))){
                     newString += String.valueOf(element.charAt(i));
                 }
                 else {
@@ -104,24 +104,26 @@ public class Scanner {
             //System.out.println(element);
             if (keywords.contains(element))
                 this.PIF.add(new Pair<>(element, new Pair<>(-1, -1)));
-            else if (this.isAValidNumber(element) || element.equals("true") || element.equals("false") || this.isAValidCharacter(element) || this.isAValidString(element)) {
+            else if (this.isAValidNumber(pair) || element.equals("true") || element.equals("false") || this.isAValidCharacter(element) || this.isAValidString(element)) {
                 this.symbolTable.add(element);
                 this.PIF.add(new Pair<>("constant", this.symbolTable.get(element)));
             }
-            else if (!Character.isLetterOrDigit(element.charAt(0)) && element.charAt(0) != '\'' && element.charAt(0) != '"' && specialCharacters.contains(element.charAt(0)))
-                this.PIF.add(new Pair<>(element, new Pair<>(-1, -1)));
             else if (this.isIdentifier(element)) {
                 this.symbolTable.add(element);
                 this.PIF.add(new Pair<>("identifier", this.symbolTable.get(element)));
-            } else {
+            }
+            else if (!Character.isLetterOrDigit(element.charAt(0)) && element.charAt(0) != '\'' && element.charAt(0) != '"' && specialCharacters.contains(element.charAt(0)))
+                this.PIF.add(new Pair<>(element, new Pair<>(-1, -1)));
+            else {
                 this.error.add("error at line: " + pair.element2 + ", token: " + element);
                 return;
             }
         }
     }
 
-
     public boolean isAValidString(String s){
+        if(s.length()==2 && s.charAt(0)=='"' && s.charAt(1)=='"')
+            return true;
         if(s.length()>=3 && s.charAt(0)=='"' && s.charAt(s.length()-1)=='"' && this.isAValidWord(s))
             return true;
         return false;
@@ -133,11 +135,16 @@ public class Scanner {
         return false;
     }
 
-    public boolean isAValidNumber(String s){
+    public boolean isAValidNumber(Pair<String, Integer> pair){
+        String s = pair.element1;
         if(s.length()<=1 && !Character.isDigit(s.charAt(0)))
             return false;
         else if(!Character.isDigit(s.charAt(0)) && s.charAt(0)!='-' && s.charAt(0)!='+')
             return false;
+        if(s.length()==2 && (s.charAt(1)=='0') && (s.charAt(0)=='+' || s.charAt(0)=='-'))
+            this.error.add("error at line: " + pair.element2 + ", token: " + s);
+        if((s.charAt(0)=='0' && s.length()>1) || (!Character.isDigit(s.charAt(0)) && s.length()>2 && s.charAt(1)=='0') )
+            this.error.add("error at line: " + pair.element2 + ", token: " + s);
         for (int i = 1; i < s.length(); i++) {
             if (!Character.isDigit(s.charAt(i)))
                 return false;
@@ -172,7 +179,8 @@ public class Scanner {
         return true;
     }
 
-    public boolean isAVectorAccess(String s){
+    public boolean isAVectorAccess(Pair<String, Integer> pair){
+        String s = pair.element1;
         if(s.length()<4)
             return false;
         if(s.charAt(s.length()-1)!=']')
@@ -195,7 +203,7 @@ public class Scanner {
                 i++;
             }
         }
-        if(!isIdentifier(number) && !isAValidNumber(number))
+        if(!isIdentifier(number) && !isAValidNumber(pair))
             return false;
         return true;
     }

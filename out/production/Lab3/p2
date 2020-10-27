@@ -1,0 +1,19 @@
+function f2{
+int nr;
+read nr;
+if (nr < +2)
+{
+write false;
+}
+int i;
+i=+2;
+while(i < nr)
+{
+ if (nr % i == 0)
+ {
+ write false;
+ }
+i=i+1;
+}
+write true;
+}
